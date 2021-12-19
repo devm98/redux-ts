@@ -1,26 +1,40 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { useActions, useTypedSelector } from "./hooks";
 
-function App() {
+const App = () => {
+  const [term, setTerm] = useState("");
+  const { searchRepositories } = useActions();
+  const { data, loading, error } = useTypedSelector(
+    (state) => state.repositories
+  );
+
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    searchRepositories(term);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Search NPM package</h1>
+      <form onSubmit={handleSearch}>
+        <input
+          type="text"
+          value={term}
+          onChange={(e) => setTerm(e.target.value)}
+        />
+        <button>Search</button>
+        {error && <h3>{error}</h3>}
+        {loading && <h3>Loading...</h3>}
+        {data && (
+          <ul>
+            {data?.map((name) => (
+              <li key={name}>{name}</li>
+            ))}
+          </ul>
+        )}
+      </form>
     </div>
   );
-}
+};
 
 export default App;
